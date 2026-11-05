@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mua Netflix Đi Mà ~</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Quicksand -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        creamBg: '#FBF9F1',
+                        cardBg: '#FFFFFF',
+                        softGray: '#E5E1DA',
+                        accentRed: '#E50914',
+                        youtubeRed: '#FF0000',
+                    },
+                    fontFamily: {
+                        sans: ['Quicksand', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #FBF9F1;
+            min-height: 100vh;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        /* Minimal Card Shadow */
+        .soft-card {
+            background: #FFFFFF;
+            border: 1px solid #E5E1DA;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Prevent unwanted scroll/selection on mobile touch */
+        #noBtn {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Soft Hover Animation */
+        .btn-bounce {
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .btn-bounce:hover {
+            transform: scale(1.04);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4 min-h-screen">
+
+    <!-- Main Container Card -->
+    <main class="soft-card w-full max-w-md rounded-3xl p-6 sm:p-8 text-center relative z-10 transition-all duration-300">
+        
+        <!-- Status Badges -->
+        <div class="flex justify-center items-center gap-2 mb-5">
+            <span class="bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 border border-red-100">
+                <i class="fa-brands fa-youtube text-red-600"></i> YouTube Premium
+            </span>
+            <span class="text-gray-400 text-xs">+</span>
+            <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 border border-gray-200">
+                <i class="fa-solid fa-tv text-gray-600"></i> Netflix ?
+            </span>
+        </div>
+
+        <!-- Cute Meme Image -->
+        <div class="w-36 h-36 mx-auto mb-4 flex items-center justify-center">
+            <img id="beggingMeme" 
+                 src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdW9ua3R3NmN6NndyeGZxc3Y2Ymxxd3F4anFtbmpmc2J2emtxcWtqbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/cLS1cfxm28n97uEEAf/giphy.gif" 
+                 alt="Cute Cat" 
+                 class="w-full h-full object-contain rounded-2xl transition-all duration-300">
+        </div>
+
+        <!-- Heading -->
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-800 mb-3">
+            Sale nốt chị tài khoảng netflix luôn 🥺
+        </h1>
+
+        <!-- Simple Dialogue Text -->
+        <div class="bg-gray-50 rounded-2xl p-4 mb-6 border border-gray-100">
+            <p id="dialogueText" class="text-gray-600 text-sm sm:text-base font-medium leading-relaxed transition-all duration-200">
+                Giờ vừa xem ytb vừa xem netflix luôn chị :))))
+            </p>
+        </div>
+
+        <!-- Interactive Buttons Container -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 min-h-[90px] relative" id="buttonArea">
+            
+            <!-- YES BUTTON -->
+            <button id="yesBtn" onclick="handleYesClick()" 
+                    class="btn-bounce bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl text-base shadow-sm transition-all duration-200 w-full sm:w-auto cursor-pointer z-10">
+                Đồng ý mua liền! ✨
+            </button>
+
+            <!-- NO BUTTON (Dodges on desktop & mobile) -->
+            <button id="noBtn" 
+                    onmouseenter="dodgeButton(event)"
+                    ontouchstart="dodgeButton(event)"
+                    onpointerdown="dodgeButton(event)"
+                    onclick="dodgeButton(event)"
+                    class="bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold py-3 px-5 rounded-xl text-sm transition-all duration-150 w-full sm:w-auto cursor-pointer">
+                <span id="noBtnText">Không nha</span>
+            </button>
+
+        </div>
+    </main>
+
+    <!-- SUCCESS MODAL -->
+    <div id="successModal" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="soft-card bg-white max-w-sm w-full rounded-3xl p-6 text-center transform scale-95 transition-all duration-300 border border-gray-100">
+            
+            <div class="w-28 h-28 mx-auto mb-3">
+                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdWdzNWU2eXZzNWhrbXpkaW1zZmpmaG84MHNhdXpmYmxid2YydXExciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/MDJ9IbxxvDUQM/giphy.gif" 
+                     alt="Happy Cat" 
+                     class="w-full h-full object-contain rounded-xl">
+            </div>
+
+            <h2 class="text-xl font-bold text-gray-800 mb-2"> 🎉🎉🎉🎉🎉🎉</h2>
+            
+            <p class="text-gray-600 text-sm mb-6 leading-relaxed">
+                Coi khỏi mần ăn gì luôn chị 🍿
+            </p>
+
+            <button onclick="closeModal()" 
+                    class="bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2.5 px-6 rounded-xl shadow transition duration-200 w-full text-sm cursor-pointer">
+                Mở Netflix
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Simple begging dialogues & GIFs (No hearts)
+        const beggingData = [
+            {
+                dialogue: "",
+                gif: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdW9ua3R3NmN6NndyeGZxc3Y2Ymxxd3F4anFtbmpmc2J2emtxcWtqbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/cLS1cfxm28n97uEEAf/giphy.gif",
+                noText: "Không nha 😜"
+            },
+            {
+                dialogue: "",
+                gif: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnJ2dWZrbnpndWZqbnRpaXJkMWoxd2MxdWV2c3U5NWNreHl1NXBhNSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ABmE0JqV58Tpy/giphy.gif",
+                noText: "Khong nha 🙈"
+            },
+            {
+                dialogue: "",
+                gif: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZGlqcmE4MWplZnFkd21xd2VreWVncmwyeHoxc2JvdXRiaXBwazZlMSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/BEob5066Eb161m596C/giphy.gif",
+                noText: "Vẫn không 🚫"
+            },
+            {
+                dialogue: "",
+                gif: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZTVibTBrMHplNXd4anVmdXdtbTh2aXBvNWF5b2Q5MnMydzVnNDBqbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/L95W4wv8nnb9K/giphy.gif",
+                noText: "Đừng mơ 👻"
+            }
+        ];
+
+        let dodgeCount = 0;
+
+        function dodgeButton(e) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            dodgeCount++;
+            const noBtn = document.getElementById('noBtn');
+            const buttonArea = document.getElementById('buttonArea');
+            const dialogueText = document.getElementById('dialogueText');
+            const beggingMeme = document.getElementById('beggingMeme');
+            const noBtnText = document.getElementById('noBtnText');
+
+            // Calculate safe bounds within the visible viewport so button doesn't fly off screen
+            const areaRect = buttonArea.getBoundingClientRect();
+            const btnRect = noBtn.getBoundingClientRect();
+
+            // Calculate max displacements while keeping inside screen boundaries
+            const maxOffsetX = Math.min(window.innerWidth / 2 - btnRect.width, 110);
+            const maxOffsetY = Math.min(window.innerHeight / 3, 120);
+
+            const x = (Math.random() - 0.5) * 2 * maxOffsetX;
+            const y = (Math.random() - 0.5) * 2 * maxOffsetY;
+
+            noBtn.style.transform = `translate(${x}px, ${y}px)`;
+
+            // Update dialogue and image
+            const dataIndex = Math.min(dodgeCount, beggingData.length - 1);
+            const currentData = beggingData[dataIndex];
+
+            dialogueText.innerText = currentData.dialogue;
+            beggingMeme.src = currentData.gif;
+            noBtnText.innerText = currentData.noText;
+        }
+
+        function handleYesClick() {
+            // Light celebration confetti
+            confetti({
+                particleCount: 60,
+                spread: 60,
+                origin: { y: 0.65 },
+                colors: ['#E50914', '#ffffff', '#E5E1DA']
+            });
+
+            // Show Modal
+            const modal = document.getElementById('successModal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.querySelector('div').classList.remove('scale-95');
+            modal.querySelector('div').classList.add('scale-100');
+        }
+
+        function closeModal() {
+            window.location.href = "https://www.netflix.com";
+        }
+    </script>
+</body>
+</html>
